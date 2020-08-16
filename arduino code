@@ -1,0 +1,82 @@
+/* 
+        VOICE CONTROLLED ROBOT USING ARDUINO
+        Give your voice commands using the Arduino Bluetooth Voice Controller App.
+        HC-04 bluetooth module receives the voice commands sent and sends it to the arduino using UART Serial Communication.
+        The received command is stored in a variable "readvoice".
+        Based on the command received the inputs to the L293D motor driver are varied and accordingly the motor and hence the robot moves.
+*/
+
+
+String readvoice;      //to store the command received
+int IN1 = 3;           //for motor1
+int IN2 = 4;           //for motor1
+int IN3 = 5;           //for motor2
+int IN4 = 6;           //for motor2
+void setup() 
+{
+  Serial.begin(9600);          //to bigin serial communication
+  pinMode (IN1, OUTPUT);       //declare the motor driver pins as output
+  pinMode (IN2, OUTPUT);
+  pinMode (IN3, OUTPUT);
+  pinMode (IN4, OUTPUT);
+  digitalWrite(IN1, LOW);      //assign digital LOW value to it 
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+void loop() 
+{
+  while (Serial.available())  //checking if the bluetooth device is sending any value
+  { 
+    delay(10); 
+    char c = Serial.read();   //every character read is stored in a variable c
+    readvoice += c;           //received charcters are added to the variable readvoice
+  } 
+  if (readvoice.length() > 0) //checking if the length of the string readvoice is greater than 0
+  { 
+    Serial.println(readvoice); //print the value received from the bluetooth device
+
+    if(readvoice == "forward") //if the value read is "forward" assign values to the input pins of motor driver such that the robot moves forward
+    {
+       digitalWrite(IN1, LOW);
+       digitalWrite (IN3, LOW);
+       digitalWrite(IN2,HIGH);
+       digitalWrite(IN4,HIGH);
+       delay(100); 
+    }
+    else if(readvoice == "back") //if the value read is "back" assign values to the input pins of motor driver such that the robot moves backward
+    { 
+       digitalWrite(IN1, HIGH);
+       digitalWrite(IN3, HIGH);
+       digitalWrite(IN2, LOW);
+       digitalWrite(IN4, LOW);
+       delay(100); 
+    }
+    else if (readvoice == "left") //if the value read is "left" assign values to the input pins of motor driver such that the robot turns to its left
+    { 
+       digitalWrite (IN1,LOW);
+       digitalWrite (IN3,LOW);
+       digitalWrite (IN2,HIGH);
+       digitalWrite (IN4,LOW);
+       delay (100);
+    }
+    else if ( readvoice == "right") //if the value read is "right" assign values to the input pins of motor driver such that the robot turns to its right
+    {
+       digitalWrite (IN1, LOW);
+       digitalWrite (IN3, LOW);
+       digitalWrite (IN2, LOW);
+       digitalWrite (IN4, HIGH);
+       delay (100);
+    }
+    else if (readvoice == "stop") //if the value read is "stop" assign values to the input pins of motor driver such that the robot stops
+    {
+       digitalWrite (IN1, LOW);
+       digitalWrite (IN3, LOW);
+       digitalWrite (IN2, LOW);
+       digitalWrite (IN4, LOW);
+       delay (100);
+    }
+   
+   readvoice="";                  //make readvoice string empty so that it can store the next command received
+   }
+} 
